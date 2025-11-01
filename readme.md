@@ -1,4 +1,7 @@
 # Campus Leave & Attendance Management System
+
+A production-ready backend service for managing student leave requests and attendance tracking in universities and hostels.
+
 ## Features
 
 - **Role-Based Access Control**: Admin, Faculty, Warden, and Student roles
@@ -9,7 +12,7 @@
 - **Notifications**: Automated notifications for leave status changes
 - **RESTful API**: Clean, documented API endpoints
 
-## 🛠️ Installation
+## Installation
 
 ### 1. Clone the Repository
 
@@ -39,7 +42,7 @@ DB_PASSWORD=postgres
 DB_NAME=campus_leave_db
 DB_SSLMODE=disable
 
-JWT_SECRET="(fill later)"
+JWT_SECRET="fill later"
 JWT_EXPIRY=24h
 ```
 
@@ -51,12 +54,15 @@ docker-compose up -d
 
 The server will start on `http://localhost:8080`
 
-## 📚 API Documentation
+## API Documentation
 
 ### Authentication
 
 #### Register
+```http
 POST /api/v1/auth/register
+Content-Type: application/json
+
 {
   "name": "John Doe",
   "email": "john@example.com",
@@ -65,15 +71,21 @@ POST /api/v1/auth/register
   "dept": "Computer Science",
   "hostel": "Block A"
 }
+```
 
 #### Login
+```http
 POST /api/v1/auth/login
+Content-Type: application/json
+
 {
   "email": "john@example.com",
   "password": "password123"
 }
+```
 
 Response:
+```json
 {
   "success": true,
   "message": "Login successful",
@@ -87,12 +99,15 @@ Response:
     "token": "eyJhbGciOiJIUzI1NiIs..."
   }
 }
+```
 
 ### Leave Management
 
 #### Apply for Leave (Student)
+```http
 POST /api/v1/leaves/apply
 Authorization: Bearer <token>
+Content-Type: application/json
 
 {
   "leave_type": "Medical",
@@ -100,41 +115,55 @@ Authorization: Bearer <token>
   "start_date": "2025-11-01",
   "end_date": "2025-11-03"
 }
+```
 
 #### Get My Leaves (Student)
+```http
 GET /api/v1/leaves/my
 Authorization: Bearer <token>
+```
 
 #### Get Pending Leaves (Faculty/Warden)
+```http
 GET /api/v1/leaves/pending
 Authorization: Bearer <token>
+```
 
 #### Approve/Reject Leave (Faculty/Warden)
+```http
 PUT /api/v1/leaves/{id}/approve
 Authorization: Bearer <token>
+Content-Type: application/json
 
 {
   "status": "approved",
   "remarks": "Approved as per medical certificate"
 }
+```
 
 ### Attendance
 
 #### Mark Attendance (Faculty/Warden)
+```http
 POST /api/v1/attendance/mark
 Authorization: Bearer <token>
+Content-Type: application/json
 
 {
   "student_id": 1,
   "date": "2025-10-29",
   "present": true
 }
+```
 
 #### Get Attendance Stats
+```http
 GET /api/v1/attendance/stats?student_id=1&start_date=2025-10-01&end_date=2025-10-31
 Authorization: Bearer <token>
+```
 
 Response:
+```json
 {
   "success": true,
   "data": {
@@ -144,18 +173,23 @@ Response:
     "attendance_percentage": 88.0
   }
 }
+```
 
 ### Analytics (Admin Only)
 
 #### Get Analytics Summary
+```http
 GET /api/v1/analytics/summary?start_date=2025-10-01&end_date=2025-10-31
 Authorization: Bearer <token>
+```
 
 #### Get Leave Type Breakdown
+```http
 GET /api/v1/analytics/leave-breakdown
 Authorization: Bearer <token>
+```
 
-## Security
+## 🔒 Security
 
 - Passwords are hashed using bcrypt
 - JWT tokens for stateless authentication
@@ -163,7 +197,7 @@ Authorization: Bearer <token>
 - Input validation on all endpoints
 - SQL injection prevention via GORM ORM
 
-## Database Schema
+## Database Structure
 
 ### Users Table
 - id (Primary Key)
