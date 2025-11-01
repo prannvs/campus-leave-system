@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: campus_leave_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: campus_leave_db
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - campus_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: campus_leave_app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 8080
+      
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: campus_leave_db
+      DB_SSLMODE: disable
+      
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_EXPIRY: 24h
+      
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 587
+      SMTP_USER: your-email@gmail.com
+      SMTP_PASSWORD: your-app-password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - campus_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  campus_network:
+    driver: bridge
